@@ -1,0 +1,1141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Absolute Value Transformations</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg:            #0d1117;
+    --surface:       #161b22;
+    --surface2:      #1c2128;
+    --border:        #21262d;
+    --parent:        #6b7f94;
+    --gx:            #38d9a9;
+    --gx-glow:       rgba(56,217,169,0.22);
+    --label:         #cdd9e5;
+    --muted:         #768390;
+    --accent:        #38d9a9;
+    --accent2:       #f0883e;
+    --accent3:       #79c0ff;
+    --text:          #e6edf3;
+    --slider-track:  #2d333b;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 32px 16px 56px;
+    gap: 32px;
+  }
+
+  /* ═══ HEADER ═══ */
+  header { text-align: center; max-width: 720px; }
+  .tag-line {
+    display: inline-block;
+    background: rgba(56,217,169,0.1);
+    color: var(--accent);
+    font-family: 'Space Mono', monospace;
+    font-size: 0.68rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 4px 12px;
+    border-radius: 20px;
+    border: 1px solid rgba(56,217,169,0.25);
+    margin-bottom: 12px;
+  }
+  header h1 {
+    font-family: 'Space Mono', monospace;
+    font-size: clamp(1.2rem, 3.5vw, 1.75rem);
+    letter-spacing: -0.02em;
+    color: var(--text);
+    line-height: 1.2;
+  }
+  header h1 span { color: var(--accent); }
+  header .subtitle {
+    margin-top: 8px;
+    font-size: 0.9rem;
+    color: var(--muted);
+    font-weight: 300;
+    line-height: 1.5;
+  }
+
+  /* ═══ INTRO CARD ═══ */
+  .intro-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 24px 28px;
+    max-width: 880px;
+    width: 100%;
+  }
+  .intro-card h2 {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.85rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--accent3);
+    margin-bottom: 12px;
+  }
+  .intro-card p {
+    font-size: 0.9rem;
+    color: var(--label);
+    line-height: 1.7;
+    font-weight: 300;
+  }
+  .intro-card p + p { margin-top: 10px; }
+  .intro-card strong { color: var(--text); font-weight: 600; }
+  .formula-box {
+    display: inline-block;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 20px;
+    font-family: 'Space Mono', monospace;
+    font-size: 1.05rem;
+    color: var(--accent);
+    margin: 12px 0 4px;
+    letter-spacing: 0.04em;
+  }
+  .param-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+    gap: 12px;
+    margin-top: 16px;
+  }
+  .param-card {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 16px;
+  }
+  .param-card .param-name {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.82rem;
+    font-weight: 700;
+    margin-bottom: 6px;
+  }
+  .param-card.a-card .param-name { color: var(--accent2); }
+  .param-card.h-card .param-name { color: var(--accent3); }
+  .param-card.k-card .param-name { color: var(--accent); }
+  .param-card p { font-size: 0.8rem; color: var(--muted); line-height: 1.55; font-weight: 300; }
+  .param-card ul { list-style: none; display: flex; flex-direction: column; gap: 6px; padding: 0; }
+  .param-card ul li {
+    font-size: 0.8rem; color: var(--muted); font-weight: 300; line-height: 1.5;
+    padding-left: 18px; position: relative;
+  }
+  .param-card ul li::before { content: '✦'; position: absolute; left: 0; font-size: 0.55rem; top: 3px; }
+  .a-card ul li::before { color: var(--accent2); }
+  .h-card ul li::before { color: var(--accent3); }
+  .k-card ul li::before { color: var(--accent); }
+
+  /* ═══ SIMULATOR ═══ */
+  .simulator {
+    display: flex;
+    gap: 24px;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: flex-start;
+    width: 100%;
+    max-width: 980px;
+  }
+  .graph-panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+    flex: 1 1 420px;
+  }
+  .equations-bar {
+    display: flex;
+    gap: 14px;
+    flex-wrap: wrap;
+    justify-content: center;
+    width: 100%;
+  }
+  .eq-block {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 18px;
+    text-align: center;
+    flex: 1 1 140px;
+  }
+  .eq-block .eq-name {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 5px;
+  }
+  .eq-block .eq-formula {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--parent);
+  }
+  .eq-block.gx .eq-formula { color: var(--accent); }
+  .eq-block.gx { border-color: rgba(56,217,169,0.3); background: rgba(56,217,169,0.04); }
+
+  #graph { width: 100%; max-width: 480px; border-radius: 8px; display: block; }
+
+  .legend {
+    display: flex; gap: 20px; justify-content: center; flex-wrap: wrap;
+  }
+  .legend-item { display: flex; align-items: center; gap: 8px; font-size: 0.78rem; color: var(--muted); }
+  .legend-line-dash { width: 26px; height: 0; border-top: 2.5px dashed var(--parent); }
+  .legend-line-solid { width: 26px; height: 3px; border-radius: 2px; background: var(--accent); }
+
+  /* ═══ CONTROLS ═══ */
+  .controls-panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 22px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    flex: 0 0 280px;
+    min-width: 260px;
+  }
+  .controls-title {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 4px;
+  }
+  .slider-group {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 16px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    transition: border-color 0.2s;
+  }
+  .slider-group.a-group:hover { border-color: rgba(240,136,62,0.4); }
+  .slider-group.h-group:hover { border-color: rgba(121,192,255,0.4); }
+  .slider-group.k-group:hover { border-color: rgba(56,217,169,0.4); }
+  .slider-header { display: flex; justify-content: space-between; align-items: baseline; }
+  .slider-label { font-family: 'Space Mono', monospace; font-size: 0.82rem; color: var(--label); }
+  .slider-label em { font-style: italic; font-weight: 700; font-size: 0.98rem; }
+  .a-group .slider-label em { color: var(--accent2); }
+  .h-group .slider-label em { color: var(--accent3); }
+  .k-group .slider-label em { color: var(--accent); }
+  .slider-value { font-family: 'Space Mono', monospace; font-size: 1rem; font-weight: 700; min-width: 44px; text-align: right; }
+  .a-group .slider-value { color: var(--accent2); }
+  .h-group .slider-value { color: var(--accent3); }
+  .k-group .slider-value { color: var(--accent); }
+  .slider-desc { font-size: 0.74rem; color: var(--muted); font-weight: 300; line-height: 1.4; }
+
+  input[type=range] {
+    -webkit-appearance: none; appearance: none;
+    width: 100%; height: 4px;
+    background: var(--slider-track); border-radius: 4px;
+    outline: none; cursor: pointer;
+  }
+  .a-group input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none; width:18px; height:18px; border-radius:50%;
+    background: var(--accent2); border: 2px solid var(--bg);
+    box-shadow: 0 0 8px rgba(240,136,62,0.45); cursor: pointer; transition: transform 0.15s;
+  }
+  .a-group input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.2); }
+  .h-group input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none; width:18px; height:18px; border-radius:50%;
+    background: var(--accent3); border: 2px solid var(--bg);
+    box-shadow: 0 0 8px rgba(121,192,255,0.45); cursor: pointer; transition: transform 0.15s;
+  }
+  .h-group input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.2); }
+  .k-group input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none; width:18px; height:18px; border-radius:50%;
+    background: var(--accent); border: 2px solid var(--bg);
+    box-shadow: 0 0 8px rgba(56,217,169,0.45); cursor: pointer; transition: transform 0.15s;
+  }
+  .k-group input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.2); }
+
+  .reset-btn {
+    margin-top: 4px; width: 100%; padding: 10px;
+    background: transparent; border: 1px solid var(--border); border-radius: 8px;
+    color: var(--muted); font-family: 'Space Mono', monospace;
+    font-size: 0.72rem; letter-spacing: 0.08em; text-transform: uppercase;
+    cursor: pointer; transition: all 0.2s;
+  }
+  .reset-btn:hover { border-color: var(--accent); color: var(--accent); background: rgba(56,217,169,0.05); }
+
+  .insight-box {
+    background: var(--bg); border: 1px solid var(--border);
+    border-radius: 10px; padding: 13px 15px;
+  }
+  .insight-label {
+    font-family: 'Space Mono', monospace; font-size: 0.63rem;
+    letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent2); margin-bottom: 6px;
+  }
+  .insight-box p { font-size: 0.8rem; color: var(--label); line-height: 1.6; font-weight: 300; }
+  .insight-box p strong { color: var(--accent); font-weight: 600; }
+  .insight-box p em { color: var(--accent2); font-style: normal; font-weight: 500; }
+
+  /* ═══ QUIZ SECTION ═══ */
+  .section-wrap { max-width: 880px; width: 100%; }
+  .section-wrap h2 {
+    font-family: 'Space Mono', monospace; font-size: 0.85rem;
+    letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--accent2); margin-bottom: 16px;
+  }
+
+  /* progress bar */
+  .quiz-progress-row {
+    display: flex; align-items: center; gap: 14px; margin-bottom: 20px;
+  }
+  .quiz-progress-bar-wrap {
+    flex: 1; height: 6px; background: var(--border); border-radius: 3px; overflow: hidden;
+  }
+  .quiz-progress-bar {
+    height: 100%; width: 0%; background: var(--accent);
+    border-radius: 3px; transition: width 0.4s ease;
+  }
+  .quiz-progress-label {
+    font-family: 'Space Mono', monospace; font-size: 0.72rem;
+    color: var(--muted); white-space: nowrap;
+  }
+  .quiz-score-badge {
+    font-family: 'Space Mono', monospace; font-size: 0.72rem;
+    color: var(--accent); background: rgba(56,217,169,0.1);
+    border: 1px solid rgba(56,217,169,0.25); border-radius: 20px;
+    padding: 3px 10px; white-space: nowrap;
+  }
+
+  /* question card */
+  .q-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 14px; padding: 22px 24px; display: none;
+    flex-direction: column; gap: 16px;
+  }
+  .q-card.active { display: flex; }
+
+  .q-header { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+  .q-tag {
+    font-family: 'Space Mono', monospace; font-size: 0.65rem;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    padding: 3px 10px; border-radius: 20px; border: 1px solid;
+  }
+  .q-tag.tag-a { color: var(--accent2); border-color: rgba(240,136,62,0.35); background: rgba(240,136,62,0.07); }
+  .q-tag.tag-h { color: var(--accent3); border-color: rgba(121,192,255,0.35); background: rgba(121,192,255,0.07); }
+  .q-tag.tag-k { color: var(--accent); border-color: rgba(56,217,169,0.35); background: rgba(56,217,169,0.07); }
+  .q-tag.tag-combo { color: #c9a9f5; border-color: rgba(201,169,245,0.35); background: rgba(201,169,245,0.07); }
+  .q-num {
+    font-family: 'Space Mono', monospace; font-size: 0.7rem;
+    color: var(--muted); margin-left: auto;
+  }
+
+  .q-instruction {
+    background: var(--bg); border-left: 3px solid var(--accent2);
+    border-radius: 0 8px 8px 0; padding: 10px 14px;
+    font-size: 0.83rem; color: var(--label); line-height: 1.55; font-weight: 300;
+  }
+  .q-instruction strong { color: var(--accent2); font-weight: 600; }
+
+  .q-text {
+    font-size: 0.95rem; font-weight: 500; color: var(--text); line-height: 1.5;
+  }
+
+  /* choices */
+  .q-choices { display: flex; flex-direction: column; gap: 9px; }
+  .q-choice {
+    display: flex; align-items: flex-start; gap: 12px;
+    background: var(--bg); border: 1px solid var(--border);
+    border-radius: 9px; padding: 11px 14px; cursor: pointer;
+    transition: border-color 0.15s, background 0.15s;
+    font-size: 0.86rem; color: var(--label); line-height: 1.4;
+    user-select: none;
+  }
+  .q-choice:hover { border-color: rgba(56,217,169,0.35); background: rgba(56,217,169,0.03); }
+  .q-choice.selected { border-color: var(--accent); background: rgba(56,217,169,0.07); }
+  .q-choice.correct  { border-color: #3fb950; background: rgba(63,185,80,0.08); color: #3fb950; pointer-events: none; }
+  .q-choice.wrong    { border-color: #f85149; background: rgba(248,81,73,0.08); color: #f85149; pointer-events: none; }
+  .q-choice.reveal   { border-color: #3fb950; background: rgba(63,185,80,0.05); color: #3fb950; pointer-events: none; }
+  .q-choice.dimmed   { opacity: 0.4; pointer-events: none; }
+
+  .choice-letter {
+    font-family: 'Space Mono', monospace; font-size: 0.72rem; font-weight: 700;
+    min-width: 20px; height: 20px; border-radius: 50%; display: flex;
+    align-items: center; justify-content: center;
+    background: var(--border); color: var(--muted); flex-shrink: 0; margin-top: 1px;
+  }
+  .q-choice.selected .choice-letter { background: var(--accent); color: var(--bg); }
+  .q-choice.correct  .choice-letter { background: #3fb950; color: var(--bg); }
+  .q-choice.wrong    .choice-letter { background: #f85149; color: var(--bg); }
+  .q-choice.reveal   .choice-letter { background: #3fb950; color: var(--bg); }
+
+  /* feedback */
+  .q-feedback {
+    display: none; border-radius: 9px; padding: 12px 15px;
+    font-size: 0.83rem; line-height: 1.55;
+  }
+  .q-feedback.show { display: block; }
+  .q-feedback.fb-correct { background: rgba(63,185,80,0.1); border: 1px solid rgba(63,185,80,0.3); color: #3fb950; }
+  .q-feedback.fb-wrong   { background: rgba(248,81,73,0.08); border: 1px solid rgba(248,81,73,0.25); color: #f97b72; }
+  .q-feedback strong { font-weight: 600; }
+
+  /* action row */
+  .q-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+  .btn-check {
+    padding: 9px 22px; background: var(--accent); color: var(--bg);
+    border: none; border-radius: 8px; font-family: 'Space Mono', monospace;
+    font-size: 0.75rem; letter-spacing: 0.06em; text-transform: uppercase;
+    cursor: pointer; font-weight: 700; transition: opacity 0.15s;
+  }
+  .btn-check:disabled { opacity: 0.35; cursor: default; }
+  .btn-check:not(:disabled):hover { opacity: 0.85; }
+  .btn-next {
+    padding: 9px 22px; background: transparent; color: var(--muted);
+    border: 1px solid var(--border); border-radius: 8px;
+    font-family: 'Space Mono', monospace; font-size: 0.75rem;
+    letter-spacing: 0.06em; text-transform: uppercase;
+    cursor: pointer; transition: all 0.2s; display: none;
+  }
+  .btn-next.show { display: block; }
+  .btn-next:hover { border-color: var(--accent); color: var(--accent); }
+
+  /* completion card */
+  .quiz-complete {
+    display: none; background: var(--surface); border: 1px solid rgba(56,217,169,0.3);
+    border-radius: 14px; padding: 32px 24px; text-align: center; flex-direction: column;
+    align-items: center; gap: 12px;
+  }
+  .quiz-complete.show { display: flex; }
+  .quiz-complete .big-score {
+    font-family: 'Space Mono', monospace; font-size: 2.8rem; font-weight: 700; color: var(--accent);
+  }
+  .quiz-complete h3 { font-size: 1.1rem; color: var(--text); }
+  .quiz-complete p { font-size: 0.87rem; color: var(--muted); max-width: 440px; line-height: 1.6; }
+  .btn-restart {
+    margin-top: 8px; padding: 10px 28px; background: transparent;
+    border: 1px solid var(--accent); color: var(--accent); border-radius: 8px;
+    font-family: 'Space Mono', monospace; font-size: 0.75rem;
+    letter-spacing: 0.08em; text-transform: uppercase; cursor: pointer; transition: all 0.2s;
+  }
+  .btn-restart:hover { background: rgba(56,217,169,0.08); }
+
+  /* ═══ REFERENCE TABLE ═══ */
+  .ref-section h2 { color: var(--accent3); }
+  .table-wrapper { border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+  .concepts-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+  .concepts-table thead tr { background: var(--surface2); }
+  .concepts-table th {
+    font-family: 'Space Mono', monospace; font-size: 0.72rem;
+    letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted);
+    padding: 10px 16px; text-align: left; border-bottom: 1px solid var(--border); font-weight: 400;
+  }
+  .concepts-table td {
+    padding: 11px 16px; border-bottom: 1px solid var(--border);
+    color: var(--label); font-weight: 300; line-height: 1.5;
+  }
+  .concepts-table tbody tr { background: var(--surface); }
+  .concepts-table tbody tr:nth-child(even) { background: var(--surface2); }
+  .concepts-table tbody tr:last-child td { border-bottom: none; }
+  .mono { font-family: 'Space Mono', monospace; font-size: 0.82rem; font-weight: 700; }
+  .tag-a { color: var(--accent2); }
+  .tag-h { color: var(--accent3); }
+  .tag-k { color: var(--accent); }
+
+  @media (max-width: 600px) {
+    .simulator { flex-direction: column; }
+    .controls-panel { flex: 1 1 100%; min-width: unset; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <div class="tag-line">Algebra 2 · Interactive Exploration</div>
+  <h1>Absolute Value Function <span>Transformations</span></h1>
+  <p class="subtitle">Use the sliders to change each parameter and watch the graph respond in real time.</p>
+</header>
+
+<!-- INTRO -->
+<div class="intro-card">
+  <h2>📖 Background</h2>
+  <p>
+    The <strong>parent function</strong> for absolute value is <strong>f(x) = |x|</strong>. It creates a V-shaped graph with its vertex at the origin (0, 0) and both arms rising at a slope of 1.
+    Any transformation of this function can be written in <strong>vertex form</strong>:
+  </p>
+  <div class="formula-box">g(x) = a|x − h| + k</div>
+  <p>
+    Each letter — <strong>a</strong>, <strong>h</strong>, and <strong>k</strong> — is a <strong>parameter</strong> that controls a specific transformation.
+    Adjusting a parameter changes the shape or position of the graph while keeping it a V-shape.
+    The vertex of g(x) is always located at the point <strong>(h, k)</strong>.
+  </p>
+  <div class="param-grid">
+    <div class="param-card a-card">
+      <div class="param-name">a &mdash; Vertical Stretch / Compression</div>
+      <ul>
+        <li>Controls how steep or wide the V-shape is</li>
+        <li>When |a| &gt; 1, the graph is <strong>narrower</strong> (vertical stretch)</li>
+        <li>When 0 &lt; |a| &lt; 1, the graph is <strong>wider</strong> (vertical compression)</li>
+        <li>When a is <strong>negative</strong>, the V flips upside down — a reflection over the x-axis</li>
+      </ul>
+    </div>
+    <div class="param-card h-card">
+      <div class="param-name">h &mdash; Horizontal Translation</div>
+      <ul>
+        <li>Moves the vertex <strong>left or right</strong> along the x-axis</li>
+        <li>When h &gt; 0, the graph shifts <strong>right</strong> h units</li>
+        <li>When h &lt; 0, the graph shifts <strong>left</strong> |h| units</li>
+        <li>The equation reads (x &minus; h), so the direction can feel counterintuitive — pay attention to the sign!</li>
+      </ul>
+    </div>
+    <div class="param-card k-card">
+      <div class="param-name">k &mdash; Vertical Translation</div>
+      <ul>
+        <li>Moves the vertex <strong>up or down</strong> along the y-axis</li>
+        <li>When k &gt; 0, the graph shifts <strong>up</strong> k units</li>
+        <li>When k &lt; 0, the graph shifts <strong>down</strong> |k| units</li>
+        <li>The value of k is always the <strong>y-coordinate of the vertex</strong></li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- SIMULATOR -->
+<div class="simulator">
+  <div class="graph-panel">
+    <div class="equations-bar">
+      <div class="eq-block">
+        <div class="eq-name">Parent Function</div>
+        <div class="eq-formula">f(x) = |x|</div>
+      </div>
+      <div class="eq-block gx">
+        <div class="eq-name">Transformed</div>
+        <div class="eq-formula" id="gx-label">g(x) = |x|</div>
+      </div>
+    </div>
+
+    <svg id="graph" viewBox="0 0 480 420" xmlns="http://www.w3.org/2000/svg"></svg>
+
+    <div class="legend">
+      <div class="legend-item">
+        <div class="legend-line-dash"></div>
+        <span>f(x) = |x| &nbsp;(parent)</span>
+      </div>
+      <div class="legend-item">
+        <div class="legend-line-solid"></div>
+        <span>g(x) &nbsp;(transformed)</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="controls-panel">
+    <div class="controls-title">Adjust Parameters</div>
+
+    <div class="slider-group a-group">
+      <div class="slider-header">
+        <span class="slider-label"><em>a</em> &mdash; Vertical Stretch</span>
+        <span class="slider-value" id="val-a">1</span>
+      </div>
+      <input type="range" id="slider-a" min="-3" max="3" step="0.25" value="1">
+      <div class="slider-desc">Steepness &amp; direction of the V. Try a = 2, then 0.5, then −1.</div>
+    </div>
+
+    <div class="slider-group h-group">
+      <div class="slider-header">
+        <span class="slider-label"><em>h</em> &mdash; Horizontal Shift</span>
+        <span class="slider-value" id="val-h">0</span>
+      </div>
+      <input type="range" id="slider-h" min="-6" max="6" step="0.5" value="0">
+      <div class="slider-desc">Moves the vertex left or right. Watch which direction the graph goes.</div>
+    </div>
+
+    <div class="slider-group k-group">
+      <div class="slider-header">
+        <span class="slider-label"><em>k</em> &mdash; Vertical Shift</span>
+        <span class="slider-value" id="val-k">0</span>
+      </div>
+      <input type="range" id="slider-k" min="-6" max="6" step="0.5" value="0">
+      <div class="slider-desc">Moves the vertex up or down. Notice k = the vertex's y-coordinate.</div>
+    </div>
+
+    <button class="reset-btn" onclick="resetSliders()">&#8635; Reset to Parent Function</button>
+
+    <div class="insight-box">
+      <div class="insight-label">💡 What's happening right now?</div>
+      <p id="insight-text">The graph matches the parent function f(x) = |x|. Try moving a slider!</p>
+    </div>
+  </div>
+</div>
+
+<!-- INTERACTIVE QUIZ -->
+<div class="section-wrap">
+  <h2>🔬 Guided Exploration — Check Your Understanding</h2>
+
+  <div class="quiz-progress-row">
+    <div class="quiz-progress-bar-wrap"><div class="quiz-progress-bar" id="progress-bar"></div></div>
+    <span class="quiz-progress-label" id="progress-label">Question 1 of 8</span>
+    <span class="quiz-score-badge" id="score-badge">Score: 0 / 0</span>
+  </div>
+
+  <!-- Q1 -->
+  <div class="q-card active" id="q1">
+    <div class="q-header">
+      <span class="q-tag tag-a">Parameter a</span>
+      <span class="q-num">1 / 8</span>
+    </div>
+    <div class="q-instruction">
+      🎯 <strong>Try it:</strong> Reset all sliders, then drag the <strong>a slider</strong> to <strong>3</strong>. Watch what happens to the V-shape.
+    </div>
+    <div class="q-text">Compared to the parent function f(x) = |x|, what happened to the graph when you set a = 3?</div>
+    <div class="q-choices" id="choices-q1">
+      <div class="q-choice" data-val="A" onclick="selectChoice('q1',this)"><span class="choice-letter">A</span>The V-shape became wider and flatter</div>
+      <div class="q-choice" data-val="B" onclick="selectChoice('q1',this)"><span class="choice-letter">B</span>The V-shape became narrower and steeper</div>
+      <div class="q-choice" data-val="C" onclick="selectChoice('q1',this)"><span class="choice-letter">C</span>The graph shifted up 3 units</div>
+      <div class="q-choice" data-val="D" onclick="selectChoice('q1',this)"><span class="choice-letter">D</span>The V flipped upside down</div>
+    </div>
+    <div class="q-feedback" id="fb-q1"></div>
+    <div class="q-actions">
+      <button class="btn-check" id="check-q1" onclick="checkAnswer('q1','B','When a > 1, the graph is vertically stretched — the arms of the V get closer together, making it look narrower and steeper. The vertex stays at (0, 0) because only <strong>a</strong> changed.')" disabled>Check Answer</button>
+      <button class="btn-next" id="next-q1" onclick="goNext(1)">Next Question →</button>
+    </div>
+  </div>
+
+  <!-- Q2 -->
+  <div class="q-card" id="q2">
+    <div class="q-header">
+      <span class="q-tag tag-a">Parameter a</span>
+      <span class="q-num">2 / 8</span>
+    </div>
+    <div class="q-instruction">
+      🎯 <strong>Try it:</strong> Keep h = 0 and k = 0, then drag the <strong>a slider</strong> to <strong>−1</strong>.
+    </div>
+    <div class="q-text">When you set a = −1, what changed about the graph?</div>
+    <div class="q-choices" id="choices-q2">
+      <div class="q-choice" data-val="A" onclick="selectChoice('q2',this)"><span class="choice-letter">A</span>The vertex moved to (0, −1)</div>
+      <div class="q-choice" data-val="B" onclick="selectChoice('q2',this)"><span class="choice-letter">B</span>The graph shifted left 1 unit</div>
+      <div class="q-choice" data-val="C" onclick="selectChoice('q2',this)"><span class="choice-letter">C</span>The V flipped upside down — it now opens downward</div>
+      <div class="q-choice" data-val="D" onclick="selectChoice('q2',this)"><span class="choice-letter">D</span>The graph became wider</div>
+    </div>
+    <div class="q-feedback" id="fb-q2"></div>
+    <div class="q-actions">
+      <button class="btn-check" id="check-q2" onclick="checkAnswer('q2','C','A <strong>negative value of a</strong> reflects the graph over the x-axis. Since |a| = 1, the steepness is unchanged — the only difference is the V now opens downward. The vertex remains at (0, 0).')" disabled>Check Answer</button>
+      <button class="btn-next" id="next-q2" onclick="goNext(2)">Next Question →</button>
+    </div>
+  </div>
+
+  <!-- Q3 -->
+  <div class="q-card" id="q3">
+    <div class="q-header">
+      <span class="q-tag tag-h">Parameter h</span>
+      <span class="q-num">3 / 8</span>
+    </div>
+    <div class="q-instruction">
+      🎯 <strong>Try it:</strong> Reset all sliders, then drag the <strong>h slider</strong> to <strong>4</strong>.
+    </div>
+    <div class="q-text">Where did the vertex move when you set h = 4?</div>
+    <div class="q-choices" id="choices-q3">
+      <div class="q-choice" data-val="A" onclick="selectChoice('q3',this)"><span class="choice-letter">A</span>Up 4 units to (0, 4)</div>
+      <div class="q-choice" data-val="B" onclick="selectChoice('q3',this)"><span class="choice-letter">B</span>Left 4 units to (−4, 0)</div>
+      <div class="q-choice" data-val="C" onclick="selectChoice('q3',this)"><span class="choice-letter">C</span>Right 4 units to (4, 0)</div>
+      <div class="q-choice" data-val="D" onclick="selectChoice('q3',this)"><span class="choice-letter">D</span>The vertex did not move</div>
+    </div>
+    <div class="q-feedback" id="fb-q3"></div>
+    <div class="q-actions">
+      <button class="btn-check" id="check-q3" onclick="checkAnswer('q3','C','When h = 4 the equation becomes g(x) = |x − 4|, and the graph shifts <strong>right 4 units</strong>. The vertex is now at (4, 0). Notice the equation uses (x − h), so a <em>positive</em> h moves the graph to the <em>right</em>.')" disabled>Check Answer</button>
+      <button class="btn-next" id="next-q3" onclick="goNext(3)">Next Question →</button>
+    </div>
+  </div>
+
+  <!-- Q4 -->
+  <div class="q-card" id="q4">
+    <div class="q-header">
+      <span class="q-tag tag-h">Parameter h</span>
+      <span class="q-num">4 / 8</span>
+    </div>
+    <div class="q-instruction">
+      🎯 <strong>Try it:</strong> Reset, then drag the <strong>h slider</strong> to <strong>−3</strong>. Read the equation shown for g(x) above the graph.
+    </div>
+    <div class="q-text">When h = −3, which equation correctly describes g(x)?</div>
+    <div class="q-choices" id="choices-q4">
+      <div class="q-choice" data-val="A" onclick="selectChoice('q4',this)"><span class="choice-letter">A</span>g(x) = |x − 3|</div>
+      <div class="q-choice" data-val="B" onclick="selectChoice('q4',this)"><span class="choice-letter">B</span>g(x) = |x| − 3</div>
+      <div class="q-choice" data-val="C" onclick="selectChoice('q4',this)"><span class="choice-letter">C</span>g(x) = |x + 3|</div>
+      <div class="q-choice" data-val="D" onclick="selectChoice('q4',this)"><span class="choice-letter">D</span>g(x) = −|x + 3|</div>
+    </div>
+    <div class="q-feedback" id="fb-q4"></div>
+    <div class="q-actions">
+      <button class="btn-check" id="check-q4" onclick="checkAnswer('q4','C','The vertex form is g(x) = a|x − h| + k. Substituting h = −3 gives g(x) = |x − (−3)| = <strong>|x + 3|</strong>. The graph shifts <strong>left 3 units</strong> to a vertex at (−3, 0). Subtracting a negative becomes addition!')" disabled>Check Answer</button>
+      <button class="btn-next" id="next-q4" onclick="goNext(4)">Next Question →</button>
+    </div>
+  </div>
+
+  <!-- Q5 -->
+  <div class="q-card" id="q5">
+    <div class="q-header">
+      <span class="q-tag tag-k">Parameter k</span>
+      <span class="q-num">5 / 8</span>
+    </div>
+    <div class="q-instruction">
+      🎯 <strong>Try it:</strong> Reset all sliders, then drag the <strong>k slider</strong> to <strong>−5</strong>.
+    </div>
+    <div class="q-text">Where is the vertex located after setting k = −5?</div>
+    <div class="q-choices" id="choices-q5">
+      <div class="q-choice" data-val="A" onclick="selectChoice('q5',this)"><span class="choice-letter">A</span>(−5, 0)</div>
+      <div class="q-choice" data-val="B" onclick="selectChoice('q5',this)"><span class="choice-letter">B</span>(0, 5)</div>
+      <div class="q-choice" data-val="C" onclick="selectChoice('q5',this)"><span class="choice-letter">C</span>(0, −5)</div>
+      <div class="q-choice" data-val="D" onclick="selectChoice('q5',this)"><span class="choice-letter">D</span>(5, 0)</div>
+    </div>
+    <div class="q-feedback" id="fb-q5"></div>
+    <div class="q-actions">
+      <button class="btn-check" id="check-q5" onclick="checkAnswer('q5','C','<strong>k = −5</strong> shifts every output down by 5. Since h = 0, the vertex moves from (0, 0) to <strong>(0, −5)</strong>. The k value is always the y-coordinate of the vertex, and changing k never affects the steepness of the V.')" disabled>Check Answer</button>
+      <button class="btn-next" id="next-q5" onclick="goNext(5)">Next Question →</button>
+    </div>
+  </div>
+
+  <!-- Q6 -->
+  <div class="q-card" id="q6">
+    <div class="q-header">
+      <span class="q-tag tag-k">Parameter k</span>
+      <span class="q-num">6 / 8</span>
+    </div>
+    <div class="q-instruction">
+      🎯 <strong>Try it:</strong> Reset, then set the <strong>k slider</strong> to <strong>3</strong>. Think about what y-values are possible for g(x).
+    </div>
+    <div class="q-text">When k = 3, what is the range of g(x) = |x| + 3?</div>
+    <div class="q-choices" id="choices-q6">
+      <div class="q-choice" data-val="A" onclick="selectChoice('q6',this)"><span class="choice-letter">A</span>All real numbers</div>
+      <div class="q-choice" data-val="B" onclick="selectChoice('q6',this)"><span class="choice-letter">B</span>y ≥ 0</div>
+      <div class="q-choice" data-val="C" onclick="selectChoice('q6',this)"><span class="choice-letter">C</span>y ≥ 3</div>
+      <div class="q-choice" data-val="D" onclick="selectChoice('q6',this)"><span class="choice-letter">D</span>y ≤ 3</div>
+    </div>
+    <div class="q-feedback" id="fb-q6"></div>
+    <div class="q-actions">
+      <button class="btn-check" id="check-q6" onclick="checkAnswer('q6','C','The lowest point on the graph is the vertex at (0, 3). Because the V opens upward, all output values are <strong>greater than or equal to 3</strong>, so the range is <strong>y ≥ 3</strong>. In general, when the V opens up, the range is y ≥ k.')" disabled>Check Answer</button>
+      <button class="btn-next" id="next-q6" onclick="goNext(6)">Next Question →</button>
+    </div>
+  </div>
+
+  <!-- Q7 -->
+  <div class="q-card" id="q7">
+    <div class="q-header">
+      <span class="q-tag tag-combo">Combining Transformations</span>
+      <span class="q-num">7 / 8</span>
+    </div>
+    <div class="q-instruction">
+      🎯 <strong>Try it:</strong> Set <strong>a = 2, h = 3, k = −1</strong> using all three sliders.
+    </div>
+    <div class="q-text">With a = 2, h = 3, and k = −1, what are the coordinates of the vertex of g(x)?</div>
+    <div class="q-choices" id="choices-q7">
+      <div class="q-choice" data-val="A" onclick="selectChoice('q7',this)"><span class="choice-letter">A</span>(−3, −1)</div>
+      <div class="q-choice" data-val="B" onclick="selectChoice('q7',this)"><span class="choice-letter">B</span>(2, 3)</div>
+      <div class="q-choice" data-val="C" onclick="selectChoice('q7',this)"><span class="choice-letter">C</span>(3, −1)</div>
+      <div class="q-choice" data-val="D" onclick="selectChoice('q7',this)"><span class="choice-letter">D</span>(3, 1)</div>
+    </div>
+    <div class="q-feedback" id="fb-q7"></div>
+    <div class="q-actions">
+      <button class="btn-check" id="check-q7" onclick="checkAnswer('q7','C','The vertex of g(x) = a|x − h| + k is always located at <strong>(h, k)</strong>. Here h = 3 and k = −1, so the vertex is at <strong>(3, −1)</strong>. The value of a controls steepness but does not move the vertex.')" disabled>Check Answer</button>
+      <button class="btn-next" id="next-q7" onclick="goNext(7)">Next Question →</button>
+    </div>
+  </div>
+
+  <!-- Q8 -->
+  <div class="q-card" id="q8">
+    <div class="q-header">
+      <span class="q-tag tag-combo">Combining Transformations</span>
+      <span class="q-num">8 / 8</span>
+    </div>
+    <div class="q-instruction">
+      🎯 <strong>Try it:</strong> Set <strong>a = −0.5, h = −2, k = 4</strong>. Use the sliders to match these values as closely as possible.
+    </div>
+    <div class="q-text">Which description best matches the graph when a = −0.5, h = −2, and k = 4?</div>
+    <div class="q-choices" id="choices-q8">
+      <div class="q-choice" data-val="A" onclick="selectChoice('q8',this)"><span class="choice-letter">A</span>A narrow V opening upward with vertex at (−2, 4)</div>
+      <div class="q-choice" data-val="B" onclick="selectChoice('q8',this)"><span class="choice-letter">B</span>A wide V opening upward with vertex at (2, 4)</div>
+      <div class="q-choice" data-val="C" onclick="selectChoice('q8',this)"><span class="choice-letter">C</span>A wide V opening downward with vertex at (−2, 4)</div>
+      <div class="q-choice" data-val="D" onclick="selectChoice('q8',this)"><span class="choice-letter">D</span>A narrow V opening downward with vertex at (2, −4)</div>
+    </div>
+    <div class="q-feedback" id="fb-q8"></div>
+    <div class="q-actions">
+      <button class="btn-check" id="check-q8" onclick="checkAnswer('q8','C','Three things are happening at once: <strong>|a| = 0.5 < 1</strong> → vertical compression (wider V); <strong>a is negative</strong> → reflection (opens downward); <strong>h = −2, k = 4</strong> → vertex at (−2, 4). All three transformations combine to create a wide, upside-down V at that vertex.')" disabled>Check Answer</button>
+      <button class="btn-next" id="next-q8" onclick="goNext(8)">Next Question →</button>
+    </div>
+  </div>
+
+  <!-- Completion -->
+  <div class="quiz-complete" id="quiz-complete">
+    <div class="big-score" id="final-score">8 / 8</div>
+    <h3 id="complete-title">Great work!</h3>
+    <p id="complete-msg">You've worked through all 8 exploration questions. Review the Quick Reference table below to reinforce what you discovered.</p>
+    <button class="btn-restart" onclick="restartQuiz()">↺ Restart Quiz</button>
+  </div>
+</div>
+
+<!-- REFERENCE TABLE -->
+<div class="section-wrap ref-section">
+  <h2>📋 Quick Reference</h2>
+  <div class="table-wrapper">
+    <table class="concepts-table">
+      <thead>
+        <tr>
+          <th>Parameter</th>
+          <th>Where it appears in g(x) = a|x − h| + k</th>
+          <th>Effect on the Graph</th>
+          <th>Vertex</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="mono tag-a">a &gt; 1</span></td>
+          <td>Coefficient in front of | |</td>
+          <td>Vertical stretch — V becomes narrower and steeper</td>
+          <td>Stays at (h, k)</td>
+        </tr>
+        <tr>
+          <td><span class="mono tag-a">0 &lt; a &lt; 1</span></td>
+          <td>Coefficient in front of | |</td>
+          <td>Vertical compression — V becomes wider and flatter</td>
+          <td>Stays at (h, k)</td>
+        </tr>
+        <tr>
+          <td><span class="mono tag-a">a &lt; 0</span></td>
+          <td>Negative coefficient in front of | |</td>
+          <td>Reflection over the x-axis — V opens downward</td>
+          <td>Stays at (h, k)</td>
+        </tr>
+        <tr>
+          <td><span class="mono tag-h">h &gt; 0</span></td>
+          <td>Value subtracted inside the | |</td>
+          <td>Horizontal shift RIGHT h units</td>
+          <td>Moves to (h, k)</td>
+        </tr>
+        <tr>
+          <td><span class="mono tag-h">h &lt; 0</span></td>
+          <td>Value subtracted inside the | |</td>
+          <td>Horizontal shift LEFT |h| units</td>
+          <td>Moves to (h, k)</td>
+        </tr>
+        <tr>
+          <td><span class="mono tag-k">k &gt; 0</span></td>
+          <td>Constant added after the | |</td>
+          <td>Vertical shift UP k units</td>
+          <td>Moves to (h, k)</td>
+        </tr>
+        <tr>
+          <td><span class="mono tag-k">k &lt; 0</span></td>
+          <td>Constant added after the | |</td>
+          <td>Vertical shift DOWN |k| units</td>
+          <td>Moves to (h, k)</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+// ════════════════════════════════════
+//  SVG CONSTANTS
+// ════════════════════════════════════
+const W = 480, H = 420;
+const CX = W / 2, CY = H / 2;
+const SCALE = 30;
+const XMIN = -CX / SCALE, XMAX = CX / SCALE;
+const YMIN = -(H - CY) / SCALE, YMAX = CY / SCALE;
+
+const svg = document.getElementById('graph');
+
+function el(tag, attrs) {
+  const e = document.createElementNS('http://www.w3.org/2000/svg', tag);
+  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  return e;
+}
+const px = x => CX + x * SCALE;
+const py = y => CY - y * SCALE;
+
+// ════════════════════════════════════
+//  LAYER 1 — BACKGROUND & GRID
+//  (appended first = bottom of stack)
+// ════════════════════════════════════
+svg.appendChild(el('rect', {x:0,y:0,width:W,height:H,fill:'#0d1117',rx:8}));
+
+for (let gx=-8;gx<=8;gx++){
+  if(gx===0) continue;
+  svg.appendChild(el('line',{x1:px(gx),y1:0,x2:px(gx),y2:H,stroke:'#1e2530','stroke-width':1}));
+}
+for (let gy=-6;gy<=6;gy++){
+  if(gy===0) continue;
+  svg.appendChild(el('line',{x1:0,y1:py(gy),x2:W,y2:py(gy),stroke:'#1e2530','stroke-width':1}));
+}
+
+// axes
+svg.appendChild(el('line',{x1:0,y1:CY,x2:W,y2:CY,stroke:'#3a4555','stroke-width':1.5}));
+svg.appendChild(el('line',{x1:CX,y1:0,x2:CX,y2:H,stroke:'#3a4555','stroke-width':1.5}));
+
+// arrowheads
+[`M ${px(XMAX-0.4)},${py(0.35)} L ${px(XMAX)},${py(0)} L ${px(XMAX-0.4)},${py(-0.35)}`,
+ `M ${px(-0.35)},${py(YMAX-0.4)} L ${px(0)},${py(YMAX)} L ${px(0.35)},${py(YMAX-0.4)}`
+].forEach(d=>svg.appendChild(el('path',{d,fill:'none',stroke:'#3a4555','stroke-width':1.5,'stroke-linejoin':'round'})));
+
+// tick numbers
+for(let gx=-7;gx<=7;gx++){
+  if(gx===0||Math.abs(gx)%2!==0) continue;
+  const t=el('text',{x:px(gx),y:CY+15,fill:'#3a4555','font-size':10,'text-anchor':'middle','font-family':'Space Mono,monospace'});
+  t.textContent=gx; svg.appendChild(t);
+}
+for(let gy=-6;gy<=6;gy++){
+  if(gy===0||Math.abs(gy)%2!==0) continue;
+  const t=el('text',{x:CX-8,y:py(gy)+4,fill:'#3a4555','font-size':10,'text-anchor':'end','font-family':'Space Mono,monospace'});
+  t.textContent=gy; svg.appendChild(t);
+}
+
+// axis labels
+const xLbl=el('text',{x:W-6,y:CY-7,fill:'#4a5568','font-size':11,'text-anchor':'end','font-family':'Space Mono,monospace'});
+xLbl.textContent='x'; svg.appendChild(xLbl);
+const yLbl=el('text',{x:CX+6,y:12,fill:'#4a5568','font-size':11,'text-anchor':'start','font-family':'Space Mono,monospace'});
+yLbl.textContent='y'; svg.appendChild(yLbl);
+const oLbl=el('text',{x:CX-8,y:CY+14,fill:'#3a4555','font-size':10,'text-anchor':'end','font-family':'Space Mono,monospace'});
+oLbl.textContent='0'; svg.appendChild(oLbl);
+
+// ════════════════════════════════════
+//  LAYER 2 — PARENT FUNCTION f(x)=|x|
+//  (appended second = above grid)
+// ════════════════════════════════════
+const parentGroup = el('g',{});
+svg.appendChild(parentGroup);   // <-- added AFTER grid
+
+function drawParent(){
+  parentGroup.innerHTML='';
+  const pts=[];
+  for(let xi=XMIN;xi<=XMAX;xi+=0.05){
+    const yi=Math.abs(xi);
+    if(yi<=YMAX+0.5) pts.push(`${px(xi)},${py(yi)}`);
+  }
+  parentGroup.appendChild(el('polyline',{
+    points:pts.join(' '),fill:'none',stroke:'#6b7f94',
+    'stroke-width':2.2,'stroke-dasharray':'7 5',opacity:0.85,'stroke-linecap':'round'
+  }));
+  parentGroup.appendChild(el('circle',{cx:px(0),cy:py(0),r:4,fill:'#6b7f94',opacity:0.8}));
+}
+
+// ════════════════════════════════════
+//  LAYER 3 — TRANSFORMED FUNCTION g(x)
+//  (appended last = topmost layer)
+// ════════════════════════════════════
+const gGroup = el('g',{});
+svg.appendChild(gGroup);        // <-- added AFTER parentGroup
+
+function drawG(a,h,k){
+  gGroup.innerHTML='';
+  const pts=[];
+  for(let xi=XMIN;xi<=XMAX;xi+=0.04){
+    const yi=a*Math.abs(xi-h)+k;
+    const clipped=Math.max(YMIN-0.5,Math.min(YMAX+0.5,yi));
+    pts.push(`${px(xi)},${py(clipped)}`);
+  }
+
+  // soft glow behind main line
+  gGroup.appendChild(el('polyline',{
+    points:pts.join(' '),fill:'none',stroke:'#38d9a9',
+    'stroke-width':8,opacity:0.13,'stroke-linecap':'round','stroke-linejoin':'round'
+  }));
+  // main teal line
+  gGroup.appendChild(el('polyline',{
+    points:pts.join(' '),fill:'none',stroke:'#38d9a9',
+    'stroke-width':2.8,'stroke-linecap':'round','stroke-linejoin':'round'
+  }));
+
+  // vertex marker
+  const vx=h, vy=k;
+  if(vx>=XMIN-0.5&&vx<=XMAX+0.5&&vy>=YMIN-0.5&&vy<=YMAX+0.5){
+    gGroup.appendChild(el('circle',{cx:px(vx),cy:py(vy),r:11,fill:'none',stroke:'#38d9a9','stroke-width':1,opacity:0.2}));
+    gGroup.appendChild(el('circle',{cx:px(vx),cy:py(vy),r:5,fill:'#38d9a9',opacity:0.95}));
+    // vertex coordinate label
+    const lx=vx>=0?px(vx)+12:px(vx)-12;
+    const anchor=vx>=0?'start':'end';
+    const vLbl=el('text',{x:lx,y:py(vy)-8,fill:'#38d9a9','font-size':10,'text-anchor':anchor,'font-family':'Space Mono,monospace',opacity:0.9});
+    vLbl.textContent=`(${fmt(vx)}, ${fmt(vy)})`;
+    gGroup.appendChild(vLbl);
+  }
+}
+
+// ════════════════════════════════════
+//  FORMATTING HELPERS
+// ════════════════════════════════════
+function fmt(n){
+  if(Number.isInteger(n)) return String(n);
+  return n.toFixed(2).replace(/\.?0+$/,'');
+}
+function formatEq(a,h,k){
+  const inside=h===0?'x':(h>0?`x − ${fmt(h)}`:`x + ${fmt(Math.abs(h))}`);
+  const aStr=a===1?'':(a===-1?'−':(a<0?`−${fmt(Math.abs(a))}`:fmt(a)));
+  const kStr=k>0?` + ${fmt(k)}`:(k<0?` − ${fmt(Math.abs(k))}`:'');
+  return `g(x) = ${aStr}|${inside}|${kStr}`;
+}
+function getInsight(a,h,k){
+  const p=[];
+  if(a>1) p.push(`<strong>a = ${fmt(a)}</strong> stretches the graph vertically — the V is steeper than the parent`);
+  else if(a>0&&a<1) p.push(`<strong>a = ${fmt(a)}</strong> compresses the graph vertically — the V is wider than the parent`);
+  if(a<0) p.push(`<em>negative a</em> reflects the graph over the x-axis — the V opens downward`);
+  if(h>0) p.push(`<strong>h = ${fmt(h)}</strong> shifts the vertex <em>right ${fmt(h)} unit${Math.abs(h)!==1?'s':''}</em>`);
+  else if(h<0) p.push(`<strong>h = ${fmt(h)}</strong> shifts the vertex <em>left ${fmt(Math.abs(h))} unit${Math.abs(h)!==1?'s':''}</em>`);
+  if(k>0) p.push(`<strong>k = ${fmt(k)}</strong> shifts the vertex <em>up ${fmt(k)} unit${Math.abs(k)!==1?'s':''}</em>`);
+  else if(k<0) p.push(`<strong>k = ${fmt(k)}</strong> shifts the vertex <em>down ${fmt(Math.abs(k))} unit${Math.abs(k)!==1?'s':''}</em>`);
+  if(p.length===0) return 'The graph matches the parent function f(x) = |x|. Try moving a slider!';
+  return p.join('; ')+`. Vertex is at <strong>(${fmt(h)}, ${fmt(k)})</strong>.`;
+}
+
+// ════════════════════════════════════
+//  UPDATE
+// ════════════════════════════════════
+function update(){
+  const a=parseFloat(document.getElementById('slider-a').value);
+  const h=parseFloat(document.getElementById('slider-h').value);
+  const k=parseFloat(document.getElementById('slider-k').value);
+  document.getElementById('val-a').textContent=fmt(a);
+  document.getElementById('val-h').textContent=fmt(h);
+  document.getElementById('val-k').textContent=fmt(k);
+  document.getElementById('gx-label').textContent=formatEq(a,h,k);
+  document.getElementById('insight-text').innerHTML=getInsight(a,h,k);
+  drawG(a,h,k);
+}
+function resetSliders(){
+  document.getElementById('slider-a').value=1;
+  document.getElementById('slider-h').value=0;
+  document.getElementById('slider-k').value=0;
+  update();
+}
+
+
+// init
+drawParent();
+update();
+['slider-a','slider-h','slider-k'].forEach(id=>
+  document.getElementById(id).addEventListener('input',update)
+);
+</script>
+<script>
+const TOTAL_Q = 8;
+let currentQ = 1;
+let score = 0;
+let answered = 0;
+const selectedAnswers = {};
+
+function selectChoice(qid, el) {
+  // ignore if already answered
+  if (document.getElementById('check-'+qid).disabled === false &&
+      document.getElementById('fb-'+qid).classList.contains('show')) return;
+  // clear others
+  document.querySelectorAll(`#choices-${qid} .q-choice`).forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  selectedAnswers[qid] = el.getAttribute('data-val');
+  document.getElementById('check-'+qid).disabled = false;
+}
+
+function checkAnswer(qid, correct, explanation) {
+  const chosen = selectedAnswers[qid];
+  if (!chosen) return;
+
+  const fb = document.getElementById('fb-'+qid);
+  const isCorrect = chosen === correct;
+
+  // style all choices
+  document.querySelectorAll(`#choices-${qid} .q-choice`).forEach(c => {
+    const val = c.getAttribute('data-val');
+    if (val === correct) {
+      c.classList.add(isCorrect && val === chosen ? 'correct' : 'reveal');
+    } else if (val === chosen && !isCorrect) {
+      c.classList.add('wrong');
+    } else {
+      c.classList.add('dimmed');
+    }
+    c.classList.remove('selected');
+  });
+
+  // feedback
+  fb.innerHTML = isCorrect
+    ? `<strong>✓ Correct!</strong> ${explanation}`
+    : `<strong>✗ Not quite.</strong> The correct answer is <strong>${correct}</strong>. ${explanation}`;
+  fb.className = `q-feedback show ${isCorrect ? 'fb-correct' : 'fb-wrong'}`;
+
+  // disable check, show next
+  document.getElementById('check-'+qid).disabled = true;
+  document.getElementById('next-'+qid).classList.add('show');
+
+  // score
+  answered++;
+  if (isCorrect) score++;
+  updateProgress();
+}
+
+function goNext(n) {
+  document.getElementById('q'+n).classList.remove('active');
+  if (n < TOTAL_Q) {
+    currentQ = n + 1;
+    document.getElementById('q'+currentQ).classList.add('active');
+    updateProgress();
+  } else {
+    showComplete();
+  }
+}
+
+function updateProgress() {
+  const pct = (answered / TOTAL_Q) * 100;
+  document.getElementById('progress-bar').style.width = pct + '%';
+  document.getElementById('progress-label').textContent =
+    answered < TOTAL_Q ? `Question ${currentQ} of ${TOTAL_Q}` : `Completed!`;
+  document.getElementById('score-badge').textContent = `Score: ${score} / ${answered}`;
+}
+
+function showComplete() {
+  document.getElementById('quiz-complete').classList.add('show');
+  document.getElementById('final-score').textContent = `${score} / ${TOTAL_Q}`;
+  const pct = score / TOTAL_Q;
+  const title = pct === 1 ? '🎉 Perfect Score!' : pct >= 0.75 ? '⭐ Great Work!' : pct >= 0.5 ? '👍 Good Effort!' : '📚 Keep Exploring!';
+  const msg = pct === 1
+    ? 'You nailed every question! You have a strong grasp of absolute value transformations.'
+    : pct >= 0.75
+    ? 'You understand most of the transformations well. Review any questions you missed using the simulator above.'
+    : 'Good start! Go back to the simulator and experiment with the sliders some more, then try again.';
+  document.getElementById('complete-title').textContent = title;
+  document.getElementById('complete-msg').textContent = msg;
+  document.getElementById('progress-label').textContent = 'Completed!';
+}
+
+function restartQuiz() {
+  score = 0; answered = 0; currentQ = 1;
+  for (const k in selectedAnswers) delete selectedAnswers[k];
+
+  for (let i = 1; i <= TOTAL_Q; i++) {
+    const card = document.getElementById('q'+i);
+    card.classList.remove('active');
+    document.querySelectorAll(`#choices-q${i} .q-choice`).forEach(c => {
+      c.className = 'q-choice';
+    });
+    const fb = document.getElementById('fb-q'+i);
+    fb.className = 'q-feedback';
+    fb.innerHTML = '';
+    document.getElementById('check-q'+i).disabled = true;
+    document.getElementById('next-q'+i).classList.remove('show');
+  }
+  document.getElementById('quiz-complete').classList.remove('show');
+  document.getElementById('q1').classList.add('active');
+  updateProgress();
+  document.getElementById('score-badge').textContent = 'Score: 0 / 0';
+  document.getElementById('progress-bar').style.width = '0%';
+  document.getElementById('progress-label').textContent = 'Question 1 of 8';
+}
+</script>
+</body>
+</html>
